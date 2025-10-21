@@ -12,11 +12,20 @@ import { Server } from "socket.io";
 const app = express();
 const server = http.createServer(app); // creating http bcoz socketio support this
 
+const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 
-// Initialize socket.io server
+app.use(cors({
+  origin: [CLIENT_URL],
+  credentials: true,
+}));
+
+// Socket.io setup
 export const io = new Server(server, {
-    cors: {origin: "*"}, // allow all the origin
-})
+  cors: {
+    origin: [CLIENT_URL],
+    methods: ["GET", "POST"],
+  },
+});
 
 // Store online users
 export const userSocketMap = {}; // {userId: socketId }
@@ -46,7 +55,6 @@ io.on("connection", (socket)=> {
 // upload image maxm of 4mb
 app.use(express.json({limit: "4mb"}));
 // allows all the url to connect our server
-app.use(cors());
 
 
 // Routes setup
@@ -58,11 +66,7 @@ app.use("/api/messages", messageRouter);
 // Connect to mongoBD
 await connectDB();
 
-if(process.env.NODE_ENV !== "production"){
-    const PORT = process.env.PORT || 5000;
-    server.listen(PORT, ()=> console.log("Server is running on PORT: " + PORT));
-}    
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, ()=> console.log("Server is running on PORT: " + PORT));  
 
-// Export server for vercel
-export default server;
 
