@@ -15,14 +15,14 @@ const server = http.createServer(app); // creating http bcoz socketio support th
 const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 
 app.use(cors({
-  origin: [CLIENT_URL],
+  origin: "*",
   credentials: true,
 }));
 
 // Socket.io setup
 export const io = new Server(server, {
   cors: {
-    origin: [CLIENT_URL],
+    origin: "*",
     methods: ["GET", "POST"],
   },
 });
